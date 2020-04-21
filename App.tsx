@@ -3,9 +3,9 @@
 import React, {Component} from 'react';
 import {
   View,
-  Text,
   Button,
-  ScrollView
+  FlatList,
+  TextInput
 } from 'react-native';
 import styles from './Styles';
 import wsc from './data/wsc.json'
@@ -25,38 +25,7 @@ export default class App extends Component<AppProps, AppState> {
   constructor(props) {
     super(props)
 
-    this.state = {
-      questionNum: 1,
-      side: Side.Question
-    }
-
     this.onTap = this.onTap.bind(this)
-    this.onSwipeLeft = this.onSwipeLeft.bind(this)
-    this.onSwipeRight = this.onSwipeRight.bind(this)
-
-    this.restart = this.restart.bind(this)
-  }
-
-  onSwipeLeft(questionNum) {
-    let newQuestionNum = questionNum + 1
-        if (newQuestionNum > getMaxNumQuestions())
-          newQuestionNum = getMaxNumQuestions()
-
-    this.setState({
-      side: Side.Question,
-      questionNum: newQuestionNum
-    })
-  }
-
-  onSwipeRight(questionNum) {
-    let newQuestionNum = questionNum - 1
-        if (newQuestionNum < 1)
-          newQuestionNum = 1
-
-    this.setState({
-      side: Side.Question,
-      questionNum: newQuestionNum
-    })
   }
 
   onTap(side: Side) {
@@ -68,40 +37,59 @@ export default class App extends Component<AppProps, AppState> {
     })
   }
 
-  restart() {
-    this.setState({
-      questionNum: 1,
-      side: Side.Question
-    })
-  }
-
   returnToTop() {
-    
+    (this.refs._flatList as any).scrollToOffset({offset: 0, animated: true})
   }
 
-  render() {
-    let cardList = []
+  jumpTo(to: number) {
+    (this.refs._flatList as any).scrollToIndex({index: '' + to, animated: true})
+  }
 
-    for (let qNum = 1; qNum <= getMaxNumQuestions(); qNum++) {
-      cardList.push(
-        <Flashcard
-          key={qNum}  
-          questionNum={qNum}
-          questionText={this.getText(qNum, Side.Question)}
-          answerText={this.getText(qNum, Side.Answer)}
-          />
-        )
+  getItemLayout (data, index) {
+    const height = 300
+    return {
+      length: height,
+      offset: height * index + height,
+      index
     }
-    
+  }
+  
+  render() {
     return(
       <View style={styles.container}>
-        <ScrollView ref='_scrollView'>
-            {cardList}
-        </ScrollView>
         <Button
             title='Back to Top'
-            onPress={() => {(this.refs._scrollView as any).scrollTo({x: 0, y: 0, animated: true})}}
+            onPress={() => this.returnToTop() }
             />
+
+        <FlatList
+          ref='_flatList'
+          data={Object.keys(wsc)}
+          getItemLayout={this.getItemLayout}
+          renderItem={({item, index}) =>
+            <Flashcard
+              key={index + 1}
+              questionNum={index + 1}
+              questionText={this.getText(index + 1, Side.Question)}
+              answerText={this.getText(index + 1, Side.Answer)}
+              />
+          }
+          keyExtractor={(item, index) => (index + 1) + ''}
+          />
+
+        
+        <View style={styles.footer}>
+          <TextInput
+            ref='gotoText'
+            style={styles.jumpToText}
+            placeholder='0'
+            keyboardType='numeric'
+            />
+          <Button
+              title='    Go    '
+              onPress={() => this.jumpTo((this.refs.gotoText as any)._lastNativeText) }
+              />
+        </View>
       </View>
     )
   }

@@ -3,6 +3,7 @@ import {
   View,
   Text
 } from 'react-native';
+import FlipCard from 'react-native-flip-card'
 import styles from '../Styles';
 
 export enum Side {
@@ -51,9 +52,14 @@ export default class Flashcard extends Component<AppProps, AppState> {
 
   render() {
     return(
-        <Text style={styles.flashcard} onPress={() => this.onTap(this.state.side)}>
-            {this.getTextForSide(this.state.side)}
-        </Text>
+        <FlipCard style={styles.flashcard} flipHorizontal={true} flipVertical={false}>
+            <Text style={styles.flashcardSide}>
+                {this.getTextForSide(Side.Question)}
+            </Text>
+            <Text style={styles.flashcardSide}>
+                {this.getTextForSide(Side.Answer)}
+            </Text>
+        </FlipCard>
     )
   }
 }
