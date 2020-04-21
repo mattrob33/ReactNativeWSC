@@ -3,8 +3,12 @@ import {
   View,
   Text
 } from 'react-native';
-import { Side } from '../App'
 import styles from '../Styles';
+
+export enum Side {
+    Question,
+    Answer
+  }
 
 interface AppProps {
     questionNum: number

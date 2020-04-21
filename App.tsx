@@ -4,16 +4,12 @@ import React, {Component} from 'react';
 import {
   View,
   Text,
+  Button,
   ScrollView
 } from 'react-native';
 import styles from './Styles';
 import wsc from './data/wsc.json'
-import Flashcard from './components/Card'
-
-export enum Side {
-  Question,
-  Answer
-}
+import Flashcard, {Side} from './components/Card'
 
 interface AppProps {
   
@@ -79,12 +75,17 @@ export default class App extends Component<AppProps, AppState> {
     })
   }
 
+  returnToTop() {
+    
+  }
+
   render() {
     let cardList = []
 
     for (let qNum = 1; qNum <= getMaxNumQuestions(); qNum++) {
       cardList.push(
         <Flashcard
+          key={qNum}  
           questionNum={qNum}
           questionText={this.getText(qNum, Side.Question)}
           answerText={this.getText(qNum, Side.Answer)}
@@ -94,9 +95,13 @@ export default class App extends Component<AppProps, AppState> {
     
     return(
       <View style={styles.container}>
-        <ScrollView>
+        <ScrollView ref='_scrollView'>
             {cardList}
         </ScrollView>
+        <Button
+            title='Back to Top'
+            onPress={() => {(this.refs._scrollView as any).scrollTo({x: 0, y: 0, animated: true})}}
+            />
       </View>
     )
   }
